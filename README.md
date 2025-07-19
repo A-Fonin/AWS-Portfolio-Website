@@ -2,6 +2,8 @@
 
 ![Architecture Diagram](https://imgur.com/FH0UuvR.png)
 
+![Monolithic website](https://imgur.com/LsZ1YNi.png).
+
 A scalable, serverless, and cost-optimized AWS portfolio website showcasing dynamic blog functionality, resume hosting, a contact form, and integration with AWS news via RSS—all built using modern AWS services.
 
 ## Table of Contents
@@ -9,8 +11,6 @@ A scalable, serverless, and cost-optimized AWS portfolio website showcasing dyna
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Deployment Workflow](#deployment-workflow)
-- [Challenges and Solutions](#challenges-and-solutions)
-- [Screenshots](#screenshots)
 - [Cost Optimization Note](#cost-optimization-note)
 - [Lessons Learned](#lessons-learned)
 
@@ -83,45 +83,11 @@ A scalable, serverless, and cost-optimized AWS portfolio website showcasing dyna
 8. ✅ Connected CloudFront to S3 + ACM SSL + Route 53 domain
 
 
-## Challenges and Solutions
 
-### 1. SSH Permission Error when Accessing EC2
-**Issue**: `Permission denied (publickey)`
-**Fix**: Ensured correct `.pem` file permissions: `chmod 400 key.pem`
-
-### 2. Lambda AccessDenied Errors
-**Issue**: Lambda couldn't write to S3 bucket
-**Fix**: Added correct IAM permissions for S3 access
-
-### 3. S3-triggered Lambda Not Firing
-**Fix**: Verified bucket notification configuration and Lambda trigger policy
-
-### 4. CloudFront 403 Error
-**Fix**: Confirmed correct origin access identity and S3 bucket policy
-
-### 5. JSON Serialization in Lambda
-**Fix**: Used `json.dumps()` and set correct headers (`Content-Type: application/json`)
-
-*(Add more as needed.)*
-
-
-## Screenshots
-
-### ✅ CloudFormation Stack Deployed
-![CFN Stack](./screenshots/cloudformation-stack.png)
-
-### ✅ Lambda Function Connected to S3
-![Lambda](./screenshots/lambda-s3.png)
-
-### ✅ CloudFront + ACM + Route 53 Setup
-![CloudFront](./screenshots/cloudfront-route53.png)
-
-*(Add more based on your earlier milestones.)*
 
 ## Cost Optimization Note
 
-To minimize AWS charges after project completion, the live website and certain resources (e.g., CloudFront distribution, EC2 instances) were deleted. This repo preserves the **full architecture**, **infrastructure templates**, and **deployment steps**, allowing easy re-deployment when needed.
-
+To minimize AWS charges after project completion, the live website and certain resources (e.g., CloudFront distribution, EC2 instances) should deleted at the end. 
 
 ## Lessons Learned
 
