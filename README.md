@@ -4,97 +4,172 @@
 
 ![Monolithic website](https://imgur.com/LsZ1YNi.png).
 
-A scalable, serverless, and cost-optimized AWS portfolio website showcasing dynamic blog functionality, resume hosting, a contact form, and integration with AWS news via RSS—all built using modern AWS services.
 
-## Table of Contents
-- [Architecture Overview](#architecture-overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Deployment Workflow](#deployment-workflow)
-- [Cost Optimization Note](#cost-optimization-note)
-- [Lessons Learned](#lessons-learned)
+## 📘 Project Overview
 
-  ## Architecture Overview
+This project is a capstone exercise in designing and deploying a cloud-native resume (CV) and AWS Latest News website. The project was completed in two phases: a server-based deployment for high availability and scalability, and a migration to a fully serverless architecture using AWS services.
 
-### Frontend Delivery
-- **Amazon CloudFront** with SSL via **ACM**
-- Custom Domain: `https://yourdomain.com`
+---
 
-### Content Storage
-- **Upload S3 Bucket** (for blog text, resumes)
-- **Transformed HTML S3 Bucket** (for frontend)
+## 🧩 The Project Brief
 
-### Compute Layer
-- **EC2 Auto Scaling Group** in private subnets
-- **Application Load Balancer** (ALB)
+The client, **exampleCorp**, is migrating their monolithic AWSPortfolio website to AWS. For ten years, the application ran on a single physical server at their head office, with tightly coupled code and backend functionality. Over time, the architecture caused performance bottlenecks, high operational costs, and an inability to iterate quickly.
 
-### Serverless Features
-- **AWS Lambda**: for blog uploads, contact form, blog fetch, and AWS news
-- **API Gateway HTTP APIs** for frontend interaction
+To resolve this, their development team:
+- Extracted static assets (HTML, CSS, JS)
+- Converted server-side features into independent **microservices**
+- Used AWS services like **Lambda**, **DynamoDB**, and **Amazon EventBridge**
+- Packaged the legacy version into an **Amazon Machine Image (AMI)**
+- Created **CloudFormation templates** for microservice provisioning
 
-### Data & Automation
-- **DynamoDB** for view tracking
-- **EventBridge** scheduled jobs
-- **SNS** email notification from contact form
+As the **Migration Lead**, my role was to:
+- Deploy the EC2-hosted web application using the AMI
+- Integrate all microservices via APIs
+- Implement security best practices
+- Transition the website to a **serverless architecture** using S3, CloudFront, and Route 53
 
-*See the full architecture diagram above.*
+---
 
-## Features
+## 🚀 Project Stages
 
-✅ Upload blog content (via S3 → Lambda)  
-✅ View dynamic blog list via Lambda + API Gateway  
-✅ Contact form with SNS email alerts  
-✅ Auto-scaled EC2 for dynamic processing (private subnet)  
-✅ Page view counter stored in DynamoDB  
-✅ Daily AWS News RSS Fetcher  
-✅ HTTPS-secured with custom domain  
-✅ Event-driven architecture (S3 triggers, EventBridge)
+### ✅ Stage 1 – Server-Based Highly Available Website
 
+**Key Objectives:**
+- Launch the website from the AMI using EC2
+- Ensure scalability, fault tolerance, and secure architecture with:
+  - **Application Load Balancer**
+  - **Auto Scaling Group**
+  - **CloudFront CDN**
+  - **Route 53 for DNS**
+- Integrate microservices using **Lambda** and **API Gateway/Function URLs**
+- Apply security principles: no public IPs on EC2 instances, least privilege IAM, strict security groups
 
-## Tech Stack
+---
 
-- AWS S3 (Static hosting, content storage)
-- Amazon CloudFront (CDN)
-- AWS Lambda (Serverless compute)
-- Amazon EC2 + Auto Scaling Group (dynamic processing)
-- Amazon ALB (load balancing)
-- Amazon API Gateway (HTTP APIs)
-- Amazon SNS (email notifications)
-- Amazon DynamoDB (view tracking)
-- Amazon EventBridge (scheduled events)
-- ACM (SSL certificates)
-- CloudFormation (Infrastructure as Code)
-- Route 53 (Domain routing)
+### ⏭️ Stage 2 – Migration to Serverless Infrastructure
 
+**Key Objectives:**
+- Migrate static assets to an **S3 bucket** configured for website hosting
+- Update **CloudFront distribution** to serve the S3 site under a custom domain
+- Modify **Route 53 DNS records** to point to the new serverless setup
 
-## Deployment Workflow
+---
 
-1. 🔧 Created VPC, private/public subnets, route tables (via CloudFormation)
-2. 🚀 Launched EC2 web servers in Auto Scaling Group with ALB
-3. 🗂️ Set up S3 buckets for content upload and transformed HTML
-4. ⚙️ Created Lambda functions for:
-    - Uploading blogs/resumes
-    - Fetching blog list
-    - Sending contact form messages
-    - Fetching AWS news daily
-5. 🌐 Configured API Gateway with Lambda integrations
-6. 🔔 Enabled EventBridge rules and S3 triggers
-7. 📬 Set up SNS topic for contact form email
-8. ✅ Connected CloudFront to S3 + ACM SSL + Route 53 domain
+## ⚙️ Prerequisites and Setup
 
+> 📍 Region: All resources are deployed in **us-east-1 (N. Virginia)**
 
+---
 
+## 🛠️ Step-by-Step Deployment
 
-## Cost Optimization Note
+### Step 1 – Launch EC2 from AMI
 
-To minimize AWS charges after project completion, the live website and certain resources (e.g., CloudFront distribution, EC2 instances) should deleted at the end. 
+Use the public AMI: `ami-0aa954d8500984aee`  
+- SSH into the instance
+- Navigate to `/var/www/html`  
+- You should see files like:
+  - `index.html`, `index.js`
+  - `blog.html`, `blog.js`
+  - `aws.html`, `aws.js`
+  - `style.css`
 
-## Lessons Learned
+Access the public IP to preview the site.
 
-- Building real-world architectures using multiple AWS services
-- Managing IAM roles and permissions for secure communication
-- Debugging Lambda, S3, and API Gateway integrations
-- Working with event-driven architecture (S3, EventBridge)
-- Using CloudFormation for reproducible infrastructure
+---
+
+### Step 2 – Deploy CloudFormation Stacks
+
+Deploy the following CloudFormation templates (in any order):
+
+- [Blog Microservice](https://cloud-mastery-bootcamp.s3.amazonaws.com/capstones/saa-capstone-1-cf-templates/blog.yaml)
+- [View Counter](https://cloud-mastery-bootcamp.s3.amazonaws.com/capstones/saa-capstone-1-cf-templates/viewcounter.yaml)
+- [Contact Form](https://cloud-mastery-bootcamp.s3.amazonaws.com/capstones/saa-capstone-1-cf-templates/contactform.yaml)
+- [AWS Latest News](https://cloud-mastery-bootcamp.s3.amazonaws.com/capstones/saa-capstone-1-cf-templates/awslatestnews.yaml)
+
+---
+
+### Step 3 – Microservice Endpoint Integration
+
+> 💡 Tip: Use Chrome DevTools > Empty Cache + Hard Reload if changes are not reflected.
+
+#### 🔸 Blog Microservice
+- Create HTTP API with GET method integrated to `FetchPostFunction`
+- Enable CORS with:
+
+Access-Control-Allow-Origin = *
+Access-Control-Allow-Headers = *
+Access-Control-Allow-Methods = *
+Access-Control-Expose-Headers = *
+
+- Add the API URL to `blog.js` (line 6)
+- Update the S3 upload bucket to trigger `CreatePostFunction` on `.txt` uploads
+
+#### 🔸 View Counter
+- Use Lambda **Function URL** with CORS enabled
+- Set auth type to `NONE`
+- Add the function URL to `index.js` (line 3)
+
+#### 🔸 Contact Form
+- Use Function URL (CORS enabled)
+- Add the function URL to `index.js` (line 34)
+
+#### 🔸 AWS Latest News
+- Use Function URL for `UpdateWebpageFunction`
+- Add to `aws.js` (line 2)
+- Run the Lambda manually once to populate DynamoDB before first page load (EventBridge runs at 9 AM UTC)
+
+---
+
+### Step 4 – Create AMI & Deploy Full Architecture
+
+Build out the following:
+- VPC
+- Public/Private Subnets
+- Application Load Balancer
+- Security Groups
+- Auto Scaling Group
+- CloudFront
+- Route 53
+
+Reference your architecture diagram for guidance.
+
+---
+
+### Step 5 – Migrate to Serverless Website
+
+Once fully tested:
+- Upload static assets to **S3**
+- Configure S3 as a static website
+- Update CloudFront to use S3 as the origin
+- Update **Route 53** DNS to point to CloudFront
+
+---
+
+## ✅ Final Thoughts
+
+This project demonstrates end-to-end cloud migration from a monolithic application to a fully managed, serverless AWS architecture — following the principles of scalability, security, fault-tolerance, and cost optimization.
+
+---
+
+## 📸 Screenshots & Architecture
+
+- `architecture-diagram.png`
+- `screenshots/`
+- `s3-setup.png`
+- `lambda-function.png`
+- etc.
+
+---
+
+## 🧰 Technologies Used
+
+- AWS EC2, AMI
+- S3, CloudFront, Route 53
+- Lambda, DynamoDB, EventBridge
+- API Gateway, Function URLs
+- CloudFormation
+- IAM, Security Groups
+
 
 
