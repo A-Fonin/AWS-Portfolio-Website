@@ -152,16 +152,6 @@ This project demonstrates end-to-end cloud migration from a monolithic applicati
 
 ---
 
-## 📸 Screenshots & Architecture
-
-- `architecture-diagram.png`
-- `screenshots/`
-- `s3-setup.png`
-- `lambda-function.png`
-- etc.
-
----
-
 ## 🧰 Technologies Used
 
 - AWS EC2, AMI
